@@ -1,0 +1,4 @@
+job:
+  image: etews/gcc-cmake-python
+  script:
+  - cmake . && make all test
