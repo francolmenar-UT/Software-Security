@@ -33,3 +33,8 @@ cmake-build-*/
 # IntelliJ
 out/
 
+.vscode
+.ccls*
+build/
+compile_commands.json
+.clang-format
