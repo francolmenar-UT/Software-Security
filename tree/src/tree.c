@@ -1,5 +1,19 @@
 #include "tree.h"
 
+void replace_node(Node* erased_node, Node* replacement) {
+    if (!erased_node->parent) return;
+    if (erased_node->parent->left == erased_node)
+        erased_node->parent->left = replacement;
+    else
+        erased_node->parent->right = replacement;
+}
+
+void delete_node(Node* node) {
+    replace_node(node, NULL);
+    free(node->name);
+    free(node);
+}
+
 /**
  * Please correct the contents of this file to make sure all functions here do
  * what they are supposed to do if you find that they do not work as expected.
@@ -18,10 +32,10 @@ Tree* tree_create() {
 void tree_node_delete(Node* node) {
     if (node == NULL) return;
 
-    free(node);
-
     tree_node_delete(node->left);
     tree_node_delete(node->right);
+
+    delete_node(node);
 }
 
 // Tree function: you are allowed to change the contents, but not the method
@@ -32,23 +46,29 @@ void tree_delete(Tree* tree) {
     free(tree);
 }
 
+Node* create_node(int age, char* name, Node* parent) {
+    Node* node = malloc(sizeof(Node));
+    node->age = age;
+    node->name = name;
+
+    node->left = NULL;
+    node->right = NULL;
+    node->parent = parent;
+
+    return node;
+}
+
 // Helper function: you are allowed to change this to your preferences
 void node_insert(Node* node, int age, char* name) {
     if (age <= node->age) {
         if (node->left == NULL) {
-            Node* newLeft = malloc(sizeof(Node));
-            newLeft->age = age;
-            newLeft->name = name;
-            node->left = newLeft;
+            node->left = create_node(age, name, node);
         } else {
             node_insert(node->left, age, name);
         }
     } else {
         if (node->right == NULL) {
-            Node* newRight = malloc(sizeof(Node));
-            newRight->age = age;
-            newRight->name = name;
-            node->right = newRight;
+            node->right = create_node(age, name, node);
         } else {
             node_insert(node->right, age, name);
         }
@@ -59,21 +79,58 @@ void node_insert(Node* node, int age, char* name) {
 // signature
 void tree_insert(Tree* tree, int age, char* name) {
     if (tree->root == NULL) {
-        Node* node = malloc(sizeof(Node));
-        node->name = name;
-        node->age = age;
-        tree->root = node;
+        tree->root = create_node(age, name, NULL);
+
     } else {
         node_insert(tree->root, age, name);
     }
+}
+
+Node* find_max_sub_node(Node* node) {
+    if (!node->right) return node;
+    return find_max_sub_node(node->right);
+}
+
+void node_erase(Node* data) {
+    if (!data->left && !data->right) {
+        replace_node(data, NULL);
+    }
+
+    else if (data->left && !data->right) {
+        replace_node(data, data->left);
+    }
+
+    else if (!data->left && data->right) {
+        replace_node(data, data->right);
+    }
+
+    else {
+        Node* replacement = find_max_sub_node(data->left);
+
+        char* tmp = data->name;
+
+        data->name = replacement->name;
+        data->age = replacement->age;
+
+        replacement->name = tmp;
+
+        node_erase(replacement);
+    }
+
+    delete_node(data);
 }
 
 // Tree function: you are allowed to change the contents, but not the method
 // signature
 void tree_erase(Tree* tree, int age, char* name) {
     Node* data = tree_find(tree, age, name);
+    if (!data) return;
 
-    free(data);
+    if (!data->parent && !data->left && !data->right) {
+        tree->root = NULL;
+    }
+
+    node_erase(data);
 }
 
 // Helper function: you are allowed to change this to your preferences

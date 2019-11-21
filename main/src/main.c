@@ -21,7 +21,7 @@ int main() {
         tree = handleString(commandBuffer, tree);
     };
 
-    free(tree);
+    tree_delete(tree);
     free(commandBuffer);
 
     return 0;
@@ -54,7 +54,7 @@ Tree* handleString(char command[], Tree* tree) {
             break;
         case 'x':
             tree_delete(tree);
-            return NULL;
+            return tree_create();
         default:
             fprintf(stderr, "Invalid command string: %s\n", command);
             break;

@@ -22,10 +22,15 @@ typedef struct Node {
      * The name of the data in this node
      */
     char* name;
+    /**
+     * The name of the data in this node
+     */
+    struct Node* parent;
+
 } Node;
 
 typedef struct Tree {
-    Node *root;
+    Node* root;
 } Tree;
 
 /**
@@ -39,7 +44,8 @@ typedef struct Tree {
 Tree* tree_create();
 
 /**
- * Delete an entire tree. This will delete the passed Node and all children below it
+ * Delete an entire tree. This will delete the passed Node and all children
+ * below it
  *
  * DO NOT MODIFY THE METHOD SIGNATURE
  * @param node The root Node of the tree to delete.
@@ -71,16 +77,18 @@ void tree_erase(Tree* tree, int age, char* name);
  * [<data>, <left>, <right>]
  * where the elements above have the following format:
  *  <data>             {<age:int>: "<name:string>"}
- *  <left>, <right>:   The same format as the root node. When a child node is NULL, the string NULL is to be printed.
+ *  <left>, <right>:   The same format as the root node. When a child node is
+ * NULL, the string NULL is to be printed.
  *
  * DO NOT MODIFY THE METHOD SIGNATURE
  * @param tree The root node for the tree to print
  * @param printNewline Whether or not to print a newline
  */
-void tree_print(Tree *tree, int printNewline);
+void tree_print(Tree* tree, int printNewline);
 
 /**
- * Find an item in the tree. Should return the tree node containing the data specified if found, or NULL if not
+ * Find an item in the tree. Should return the tree node containing the data
+ * specified if found, or NULL if not
  *
  * DO NOT MODIFY THE METHOD SIGNATURE
  * @param tree The tree to search in
@@ -90,4 +98,4 @@ void tree_print(Tree *tree, int printNewline);
  */
 Node* tree_find(Tree* node, int age, char* name);
 
-#endif //C_IMPLEMENTATION_TREE_H
+#endif  // C_IMPLEMENTATION_TREE_H
