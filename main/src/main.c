@@ -4,6 +4,30 @@
 #include <string.h>
 #include "tree.h"
 
+#define MAX_NAME_BUFFER_SIZE 10000
+
+int get_name_index() {
+    static int count = 0;
+
+    if (count >= MAX_NAME_BUFFER_SIZE) {
+        printf("WARNING: Max size of name allocation buffer reached\n");
+    }
+
+    return count++;
+}
+
+char* NAME_BUFFER[MAX_NAME_BUFFER_SIZE];
+
+void free_name_buffer() {
+    int name_allocation_count = get_name_index();
+
+    printf("Freeing %d name allocations\n", name_allocation_count);
+
+    for (int i = name_allocation_count - 1; i >= 0; --i) {
+        free(NAME_BUFFER[i]);
+    }
+}
+
 // You are allowed to change anything about this function to fix it
 int main() {
     char* commandBuffer = (char*)malloc(sizeof(char) * 20);
@@ -23,6 +47,7 @@ int main() {
 
     tree_delete(tree);
     free(commandBuffer);
+    free_name_buffer();
 
     return 0;
 }
@@ -75,6 +100,8 @@ Tree* insert(char* command, Tree* tree) {
         free(name);
         return NULL;
     }
+
+    NAME_BUFFER[get_name_index()] = name;
 
     if (tree == NULL) {
         tree = tree_create();

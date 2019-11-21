@@ -1,16 +1,23 @@
 #include "tree.h"
 
+//
 void replace_node(Node* erased_node, Node* replacement) {
     if (!erased_node->parent) return;
+
     if (erased_node->parent->left == erased_node)
         erased_node->parent->left = replacement;
     else
         erased_node->parent->right = replacement;
+
+    if (replacement) replacement->parent = erased_node->parent;
 }
 
 void delete_node(Node* node) {
-    replace_node(node, NULL);
-    free(node->name);
+    printf("Deleting node with name %s\n", node->name);
+
+    // TODO: Should we delete name here?? If the name is passed as a literal
+    // we get double free...
+    // free(node->name);
     free(node);
 }
 
@@ -91,17 +98,24 @@ Node* find_max_sub_node(Node* node) {
     return find_max_sub_node(node->right);
 }
 
-void node_erase(Node* data) {
+Node* node_erase(Node* data) {
+    Node* new_top = NULL;
+
     if (!data->left && !data->right) {
         replace_node(data, NULL);
+        delete_node(data);
     }
 
     else if (data->left && !data->right) {
         replace_node(data, data->left);
+        new_top = data->left;
+        delete_node(data);
     }
 
     else if (!data->left && data->right) {
         replace_node(data, data->right);
+        new_top = data->right;
+        delete_node(data);
     }
 
     else {
@@ -114,10 +128,12 @@ void node_erase(Node* data) {
 
         replacement->name = tmp;
 
+        new_top = data;
+
         node_erase(replacement);
     }
 
-    delete_node(data);
+    return new_top;
 }
 
 // Tree function: you are allowed to change the contents, but not the method
@@ -130,7 +146,13 @@ void tree_erase(Tree* tree, int age, char* name) {
         tree->root = NULL;
     }
 
-    node_erase(data);
+    if (data == tree->root) {
+        Node* new_top = node_erase(data);
+        tree->root = new_top;
+
+    } else {
+        node_erase(data);
+    }
 }
 
 // Helper function: you are allowed to change this to your preferences
