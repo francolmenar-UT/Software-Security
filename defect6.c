@@ -14,7 +14,6 @@ int main (int argc, char ** argv) {
     fd = open(argv[1], O_RDONLY);
   }
 
-
   char *buf;
   int i, len;
   read(fd, &len, sizeof(len));
@@ -25,7 +24,9 @@ int main (int argc, char ** argv) {
   }
 
   buf = malloc(len);
-  read(fd,buf,len);
+  read(fd, buf, len);
+
+  // Missing free
 
   return 0;
 }

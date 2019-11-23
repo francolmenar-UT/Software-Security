@@ -8,6 +8,8 @@ int main(int argc, char** argv) {
   FILE * f;
   int fd;
 
+
+  // Someone can open after this and before chmod...
   f = fopen("/tmp/asecret.txt", "w");
 
   if (f == NULL) {
@@ -18,11 +20,15 @@ int main(int argc, char** argv) {
   fd = fileno(f);
 
   if (fd == -1) {
+    // ADDED
+    // fclose(f);
     perror("failed to get fd");
     return 1;
   }
 
   if (fchmod(fd, S_IRUSR | S_IWUSR) != 0) {
+    // ADDED
+    fclose(f);
     perror("failed to chmod");
     return 1;
   }

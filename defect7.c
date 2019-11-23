@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-
 int main(int argc, char**argv) {
   int fd;
 
@@ -25,8 +24,10 @@ int main(int argc, char**argv) {
   buf = malloc(len + 1);
 
   read(fd, buf, len);
+
   buf[len] = '\0'; // null terminate buf
 
+  // NO FREE
 
   return 0;
 }
