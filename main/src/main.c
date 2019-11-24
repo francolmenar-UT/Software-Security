@@ -93,7 +93,7 @@ Tree* insert(char* command, Tree* tree) {
     int age;
     char* name = malloc(sizeof(char) * 20);
 
-    if (2 != sscanf(command, "i %d %20s", &age, name)) {
+    if (2 != sscanf(command, "i %d %19s", &age, name)) {
         fprintf(
             stderr,
             "Failed to parse insert command: not enough parameters filled\n");
@@ -116,7 +116,7 @@ void erase(char* command, Tree* tree) {
     int age;
     char* name = malloc(sizeof(char) * 20);
 
-    if (2 != sscanf(command, "e %d %20s", &age, name)) {
+    if (2 != sscanf(command, "e %d %19s", &age, name)) {
         fprintf(
             stderr,
             "Failed to parse erase command: not enough parameters filled\n");
@@ -131,7 +131,7 @@ void check(char* command, Tree* tree) {
     int age;
     char* name = malloc(sizeof(char) * 20);
 
-    if (2 != sscanf(command, "c %d %20s", &age, name)) {
+    if (2 != sscanf(command, "c %d %19s", &age, name)) {
         fprintf(stderr, "Failed to parse check command\n");
         free(name);
         return;
