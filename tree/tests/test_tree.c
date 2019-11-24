@@ -11,9 +11,13 @@
 #include <stdlib.h>
 #include "tree.h"
 
+#define NR_ITER 100000
+
 // You are allowed to change anything about this function to your preferences
 int main() {
     Tree* tree = tree_create();
+
+    /*
 
     printf("Checking basic functionality doesn't crash...\n");
     tree_insert(tree, 42, "Peter");
@@ -49,12 +53,13 @@ int main() {
         "Stress testing your tree (to help you check for possible memory "
         "errors)");
 
+    */
     // This makes the results reproducable
     srand(0xC0FFEE);
 
-    char* names[10000];
+    char* names[NR_ITER];
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < NR_ITER; i++) {
         int age = (int)(random() % 1000);
         char* name = malloc(sizeof(char) * 10);
         sprintf(name, "Name%d", age);
@@ -62,24 +67,33 @@ int main() {
         // Store names so we can free them later
         names[i] = name;
 
-        if (tree_find(tree, age, name)) {
-            tree_erase(tree, age, name);
-        } else {
-            tree_insert(tree, age, name);
-        }
+        // printf("test before - Root is %p for %i and %s\n", tree->root, age,
+        //        name);
+        // if (tree_find(tree, age, name)) {
+        //     tree_erase(tree, age, name);
+        // } else {
+        //     tree_insert(tree, age, name);
+        // }
+        if (!tree_find(tree, age, name)) tree_insert(tree, age, name);
+
+        // printf("test after - Root is %p for %i and %s\n", tree->root, age,
+        //        name);
     }
+
     tree_print(tree, 1);
+    // inorder_print(tree->root);
+    // printf("\n");
 
     // Feel free to add your own tests here or somewhere else in this file
 
     // Free name allocations
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < NR_ITER; i++) {
         free(names[i]);
     }
 
     // Free tree
     tree_delete(tree);
-
+    return 1;
     printf("The test succeeded\n");
     return 0;
 }

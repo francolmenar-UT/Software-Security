@@ -21,7 +21,7 @@ char* NAME_BUFFER[MAX_NAME_BUFFER_SIZE];
 void free_name_buffer() {
     int name_allocation_count = get_name_index();
 
-    printf("Freeing %d name allocations\n", name_allocation_count);
+    // printf("Freeing %d name allocations\n", name_allocation_count);
 
     for (int i = name_allocation_count - 1; i >= 0; --i) {
         free(NAME_BUFFER[i]);

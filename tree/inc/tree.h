@@ -27,7 +27,11 @@ typedef struct Node {
      */
     struct Node* parent;
 
+    int height;
+
 } Node;
+
+void inorder_print(Node* node);
 
 typedef struct Tree {
     Node* root;

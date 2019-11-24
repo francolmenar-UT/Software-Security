@@ -1,4 +1,171 @@
 #include "tree.h"
+#include <assert.h>
+// Utility functions for AVL tree
+
+#define MAX(a, b)               \
+    ({                          \
+        __typeof__(a) _a = (a); \
+        __typeof__(b) _b = (b); \
+        _a > _b ? _a : _b;      \
+    })
+
+int get_height(Node* node) {
+    if (node != NULL) return node->height;
+
+    return 0;
+}
+
+int get_height_diff(Node* node) {
+    if (node != NULL) {
+        return get_height(node->left) - get_height(node->right);
+    }
+
+    return 0;
+}
+
+Node* rotate_right(Node* y) {
+    Node* x = y->left;
+    Node* tmp = x->right;
+
+    // Rot
+
+    x->right = y;
+    y->left = tmp;
+
+    x->height = MAX(get_height(x->left), get_height(x->right)) + 1;
+    y->height = MAX(get_height(y->left), get_height(y->right)) + 1;
+
+    return x;
+}
+
+Node* rotate_left(Node* x) {
+    Node* y = x->right;
+    Node* tmp = y->left;
+
+    // Rot
+    y->left = x;
+    x->right = tmp;
+
+    x->height = MAX(get_height(x->left), get_height(x->right)) + 1;
+    y->height = MAX(get_height(y->left), get_height(y->right)) + 1;
+
+    return y;
+}
+
+Node* create_node(int age, char* name, Node* parent);
+
+Node* avl_insert(Node* node, int age, char* name) {
+    if (node == NULL) {
+        return create_node(age, name, NULL);
+    }
+
+    if (node->age > age) {
+        node->left = avl_insert(node->left, age, name);
+    } else {
+        node->right = avl_insert(node->right, age, name);
+    }
+
+    node->height = MAX(get_height(node->left), get_height(node->right)) + 1;
+
+    int height_diff = get_height_diff(node);
+
+    if (height_diff > 1 && age < node->left->age) {
+        return rotate_right(node);
+    }
+
+    if (height_diff < -1 && age > node->right->age) {
+        return rotate_left(node);
+    }
+
+    if (height_diff > 1 && age > node->left->age) {
+        node->left = rotate_left(node->left);
+        return rotate_right(node);
+    }
+
+    if (height_diff < -1 && age < node->right->age) {
+        node->right = rotate_right(node->right);
+        return rotate_left(node);
+    }
+
+    return node;
+}
+
+Node* find_min_sub_node(Node* node) {
+    if (!node->left) return node;
+    return find_min_sub_node(node->left);
+}
+
+Node* avl_erase(Node* node, int age, char* name) {
+    if (node == NULL) return node;
+
+    if (age < node->age) {
+        node->left = avl_erase(node->left, age, name);
+    } else if (age > node->age) {
+        node->right = avl_erase(node->right, age, name);
+    }
+    // Age is the same as in node
+    else if (age == node->age && strcmp(name, node->name) == 0) {
+        if (node->left == NULL || node->right == NULL) {
+            Node* tmp;
+            if (node->left != NULL) {
+                tmp = node->left;
+                node->left = NULL;
+            } else {
+                tmp = node->right;
+                node->right = NULL;
+            }
+
+            if (tmp == NULL) {
+                tmp = node;
+                node = NULL;
+            } else {
+                node->name = tmp->name;
+                node->age = tmp->age;
+            }
+
+            free(tmp);
+        } else {
+            Node* tmp = find_min_sub_node(node->right);
+            // printf("find_min_sub_tree(%i, %s) = (%i, %s)\n", node->age,
+            //        node->name, tmp->age, tmp->name);
+
+            node->age = tmp->age;
+            node->name = tmp->name;
+
+            node->right = avl_erase(node->right, tmp->age, tmp->name);
+        }
+    } else {
+        return node;
+    }
+
+    if (node == NULL) {
+        return node;
+    }
+
+    node->height = MAX(get_height(node->left), get_height(node->right)) + 1;
+
+    int height_diff = get_height_diff(node);
+
+    if (height_diff > 1 && get_height_diff(node->left) >= 0) {
+        return rotate_right(node);
+    }
+
+    if (height_diff > 1 && get_height_diff(node->left) < 0) {
+        node->left = rotate_left(node->left);
+        return rotate_right(node);
+    }
+
+    if (height_diff < -1 && get_height_diff(node->right) <= 0) {
+        return rotate_left(node);
+    }
+
+    if (height_diff < -1 && get_height_diff(node->right) > 0) {
+        node->right = rotate_right(node->right);
+        return rotate_left(node);
+    }
+
+    return node;
+}
 
 //
 void replace_node(Node* erased_node, Node* replacement) {
@@ -13,7 +180,7 @@ void replace_node(Node* erased_node, Node* replacement) {
 }
 
 void delete_node(Node* node) {
-    printf("Deleting node with name %s\n", node->name);
+    // printf("Deleting node with name %s\n", node->name);
 
     // TODO: Should we delete name here?? If the name is passed as a literal
     // we get double free...
@@ -61,12 +228,24 @@ Node* create_node(int age, char* name, Node* parent) {
     node->left = NULL;
     node->right = NULL;
     node->parent = parent;
+    node->height = 1;
 
     return node;
 }
 
+void inorder_print(Node* node) {
+    if (node != NULL) {
+        inorder_print(node->left);
+        printf("%i, ", node->age);
+        inorder_print(node->right);
+    }
+}
+
 // Helper function: you are allowed to change this to your preferences
 void node_insert(Node* node, int age, char* name) {
+    avl_insert(node, age, name);
+
+    return;
     if (age <= node->age) {
         if (node->left == NULL) {
             node->left = create_node(age, name, node);
@@ -89,14 +268,13 @@ void tree_insert(Tree* tree, int age, char* name) {
         tree->root = create_node(age, name, NULL);
 
     } else {
-        node_insert(tree->root, age, name);
+        tree->root = avl_insert(tree->root, age, name);
+        // printf("insert - Root is %p for %i and %s\n", tree->root, age, name);
+        // tree->root = node_insert(tree->root, age, name);
     }
 }
 
-Node* find_max_sub_node(Node* node) {
-    if (!node->right) return node;
-    return find_max_sub_node(node->right);
-}
+Node* find_max_sub_node(Node* asd) { return NULL; }
 
 Node* node_erase(Node* data) {
     Node* new_top = NULL;
@@ -139,6 +317,10 @@ Node* node_erase(Node* data) {
 // Tree function: you are allowed to change the contents, but not the method
 // signature
 void tree_erase(Tree* tree, int age, char* name) {
+    tree->root = avl_erase(tree->root, age, name);
+    // printf("erase - Root is %p for %i and %s\n", tree->root, age, name);
+
+    return;
     Node* data = tree_find(tree, age, name);
     if (!data) return;
 
