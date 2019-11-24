@@ -2,12 +2,14 @@
 #include <assert.h>
 // Utility functions for AVL tree
 
-#define MAX(a, b)               \
-    ({                          \
-        __typeof__(a) _a = (a); \
-        __typeof__(b) _b = (b); \
-        _a > _b ? _a : _b;      \
-    })
+// #define MAX(a, b)               \
+//     ({                          \
+//         __typeof__(a) _a = (a); \
+//         __typeof__(b) _b = (b); \
+//         _a > _b ? _a : _b;      \
+//     })
+
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 int get_height(Node* node) {
     if (node != NULL) return node->height;
@@ -23,8 +25,15 @@ int get_height_diff(Node* node) {
     return 0;
 }
 
+void set_height(Node* node, int height) {
+    // printf("setting node %d to height=%d\n", node->age, height);
+    node->height = height;
+}
+
 Node* rotate_right(Node* y) {
     Node* x = y->left;
+    // if (!x) return y;
+    // printf("asdsadsadsad1\n");
     Node* tmp = x->right;
 
     // Rot
@@ -32,27 +41,36 @@ Node* rotate_right(Node* y) {
     x->right = y;
     y->left = tmp;
 
-    x->height = MAX(get_height(x->left), get_height(x->right)) + 1;
-    y->height = MAX(get_height(y->left), get_height(y->right)) + 1;
+    // printf("%d\n", x->right->age);
+    // printf("%d, %d\n", get_height(x->left), get_height(x->right));
+    // printf("%d, %d\n", get_height(y->left), get_height(y->right));
+
+    set_height(y, MAX(get_height(y->left), get_height(y->right)) + 1);
+    set_height(x, MAX(get_height(x->left), get_height(x->right)) + 1);
 
     return x;
 }
 
 Node* rotate_left(Node* x) {
+    // printf("asdsadsadsad2\n");
+
     Node* y = x->right;
+    // if (!y) return x;
     Node* tmp = y->left;
 
     // Rot
     y->left = x;
     x->right = tmp;
 
-    x->height = MAX(get_height(x->left), get_height(x->right)) + 1;
-    y->height = MAX(get_height(y->left), get_height(y->right)) + 1;
+    set_height(x, MAX(get_height(x->left), get_height(x->right)) + 1);
+    set_height(y, MAX(get_height(y->left), get_height(y->right)) + 1);
 
     return y;
 }
 
 Node* create_node(int age, char* name, Node* parent);
+
+void tree_print_node(Node* node);
 
 Node* avl_insert(Node* node, int age, char* name) {
     if (node == NULL) {
@@ -65,9 +83,31 @@ Node* avl_insert(Node* node, int age, char* name) {
         node->right = avl_insert(node->right, age, name);
     }
 
-    node->height = MAX(get_height(node->left), get_height(node->right)) + 1;
+    // tree_print_node(node);
+
+    // printf("height before: %d\n", node->height);
+    // printf("height left=%d\n", get_height(node->left));
+    // printf("height right=%d\n", get_height(node->right));
+
+    set_height(node, MAX(get_height(node->left), get_height(node->right)) + 1);
+    // printf("node with age=%d and name=%s\n", node->age, node->name);
+    // printf("left: ");
+    // if (node->left != NULL) {
+    //     printf("%d\n", node->left->age);
+    // } else {
+    //     printf("NULL\n");
+    // }
+
+    // printf("right: ");
+    // if (node->right != NULL) {
+    //     printf("%d\n", node->right->age);
+    // } else {
+    //     printf("NULL\n");
+    // }
+    // printf("height after: %d\n", node->height);
 
     int height_diff = get_height_diff(node);
+    // printf("height_diff: %d\n", height_diff);
 
     if (height_diff > 1 && age < node->left->age) {
         return rotate_right(node);
@@ -269,7 +309,9 @@ void tree_insert(Tree* tree, int age, char* name) {
 
     } else {
         tree->root = avl_insert(tree->root, age, name);
-        // printf("insert - Root is %p for %i and %s\n", tree->root, age, name);
+        // printf("\ninsert with age %d and name %s: height=%i\n\n", age, name,
+        //        tree->root->height);
+        // // printf("insert - Root is %p for %i and %s\n", tree->root, age, name);
         // tree->root = node_insert(tree->root, age, name);
     }
 }

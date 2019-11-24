@@ -67,14 +67,21 @@ int main() {
         // Store names so we can free them later
         names[i] = name;
 
+        // if (i % 9 == 0) {
+        //     tree_delete(tree);
+        //     tree = tree_create();
+        // }
+
         // printf("test before - Root is %p for %i and %s\n", tree->root, age,
         //        name);
-        // if (tree_find(tree, age, name)) {
-        //     tree_erase(tree, age, name);
-        // } else {
-        //     tree_insert(tree, age, name);
-        // }
-        if (!tree_find(tree, age, name)) tree_insert(tree, age, name);
+        if (tree_find(tree, age, name)) {
+            tree_erase(tree, age, name);
+        } else {
+            tree_insert(tree, age, name);
+        }
+        // tree_print(tree, 1);
+        // printf("Inserting %d, %s\n", age, name);
+        // if (!tree_find(tree, age, name)) tree_insert(tree, age, name);
 
         // printf("test after - Root is %p for %i and %s\n", tree->root, age,
         //        name);
