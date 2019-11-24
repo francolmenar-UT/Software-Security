@@ -17,7 +17,7 @@
 int main() {
     Tree* tree = tree_create();
 
-    /*
+    
 
     printf("Checking basic functionality doesn't crash...\n");
     tree_insert(tree, 42, "Peter");
@@ -53,7 +53,7 @@ int main() {
         "Stress testing your tree (to help you check for possible memory "
         "errors)");
 
-    */
+    
     // This makes the results reproducable
     srand(0xC0FFEE);
 
@@ -87,7 +87,7 @@ int main() {
         //        name);
     }
 
-    tree_print(tree, 1);
+    // tree_print(tree, 1);
     // inorder_print(tree->root);
     // printf("\n");
 
@@ -100,7 +100,6 @@ int main() {
 
     // Free tree
     tree_delete(tree);
-    return 1;
     printf("The test succeeded\n");
     return 0;
 }
