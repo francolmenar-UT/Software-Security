@@ -234,7 +234,7 @@ impl Node {
 
     pub fn print_json(&self) {
         print!("[");
-        print!("{{\"{}\":\"{}\"}}, ", self.key, self.data);
+        print!("{{\"{}\":\"{}\"}},", self.key, self.data);
         match self.left {
             Some(ref node) => {
                 node.print_json();
@@ -243,7 +243,7 @@ impl Node {
                 print!("null");
             }
         }
-        print!(", ");
+        print!(",");
 
         match self.right {
             Some(ref node) => {
