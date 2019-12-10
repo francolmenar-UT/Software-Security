@@ -65,23 +65,78 @@ impl Node {
         Node::reconstruct(root)
     }
 
-    // pub fn erase_helper(node: NodePtr) -> NodePtr {
-    //     node
-    // }
+    fn find_min_sub_node(root: &Link) -> Option<&NodePtr> {
+        let mut tmp: &Link = root;
 
-    // pub fn erase(root: NodePtr, key: i32, data: String) -> Link {
-    //     if key > root.key {
-    //         root.right = Node::erase(root.right.take(), key, data);
-    //     } else if key < root.key {
-    //         root.left = Node::erase(root.left.take(), key, data);
-    //     } else if key == root.key && data == root.data {
-    //     } else {
-    //         root = Node::erase_helper(root);
-    //     }
+        loop {
+            match &tmp.as_ref() {
+                Some(node) => {
+                    if node.left.is_none() {
+                        return tmp.as_ref();
+                    } else {
+                        tmp = &node.left;
+                    }
+                }
+                None => unreachable!(),
+            }
+        }
+    }
 
-    //     Node::update_height(&mut *root);
-    //     Some(Node::reconstruct(root))
-    // }
+    pub fn erase(mut root: Link, key: i32, data: String) -> Link {
+        match root.take() {
+            None => return None,
+            Some(mut node) => {
+                if key < node.key {
+                    node.left = Node::erase(node.left, key, data);
+                } else if key > node.key {
+                    node.right = Node::erase(node.right, key, data);
+                } else if key == node.key && data == node.data {
+                    if node.left.is_none() || node.right.is_none() {
+                        let mut tmp: Link;
+
+                        if node.left.is_none() {
+                            tmp = node.left.take();
+                        } else {
+                            tmp = node.right.take();
+                        }
+
+                        match tmp.take() {
+                            None => unreachable!(),
+                            Some(n) => {
+                                node.data = n.data;
+                                node.key = n.key;
+                            }
+                        }
+                    } else {
+                        let mut tmp = Node::find_min_sub_node(&node.right);
+
+                        match tmp.take() {
+                            None => unreachable!(),
+                            Some(n) => {
+                                node.key = n.key;
+                                node.data = n.data.clone();
+                            }
+                        }
+
+                        node.right = Node::erase(node.right, node.key, node.data.clone());
+                    }
+                } else {
+                    return root;
+                }
+
+                root = Some(node);
+            }
+        }
+
+        if root.is_none() {
+            return None;
+        }
+
+        root.map(|mut n| {
+            Node::update_height(&mut n);
+            Node::reconstruct(n)
+        })
+    }
 
     fn key(node: &Link) -> i32 {
         match node {
