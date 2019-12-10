@@ -109,13 +109,33 @@ mod test {
         use rand::Rng;
 
         let nr_iters = 100;
+        let mut bst = BST::new();
 
         for _ in 0..nr_iters {
             let mut rng = rand::thread_rng();
-            let mut bst = BST::new();
 
             bst.insert(rng.gen_range(0, 1000), String::from("abc"));
             bst.print_json();
         }
+    }
+
+    #[test]
+    fn print_fuzz_insert_erase() {
+        use rand::Rng;
+
+        let nr_iters = 10000;
+        let mut bst = BST::new();
+
+        for _ in 0..nr_iters {
+            let mut rng = rand::thread_rng();
+            bst.insert(rng.gen_range(0, 10000), String::from("abc"));
+        }
+
+        for _ in 0..(nr_iters / 2) {
+            let mut rng = rand::thread_rng();
+            bst.erase(rng.gen_range(0, 10000), String::from("abc"));
+        }
+
+        bst.print_json();
     }
 }

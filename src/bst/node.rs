@@ -97,10 +97,8 @@ impl Node {
                         let tmp: Link;
 
                         if node.left.is_some() {
-                            println!("Left is Some for {}", key);
                             tmp = node.left.take();
                         } else {
-                            println!("Right is Some for {}", key);
                             tmp = node.right.take();
                         }
 
@@ -126,7 +124,6 @@ impl Node {
                         node.right = Node::erase(node.right, node.key, node.data.clone());
                     }
                 } else {
-                    println!("Returning for else()");
                     return root;
                 }
 
@@ -137,12 +134,10 @@ impl Node {
         }
 
         if root.is_none() {
-            println!("Returning for is_none()");
             return None;
         }
 
         root.map(|mut n| {
-            println!("Returning for key {}", n.key);
             Node::update_height(&mut n);
             Node::reconstruct(n)
         })
@@ -239,7 +234,7 @@ impl Node {
 
     pub fn print_json(&self) {
         print!("[");
-        print!("{{ \"{}\": \"{}\" }}, ", self.key, self.data);
+        print!("{{\"{}\":\"{}\"}}, ", self.key, self.data);
         match self.left {
             Some(ref node) => {
                 node.print_json();
