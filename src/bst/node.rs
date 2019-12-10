@@ -83,6 +83,8 @@ impl Node {
     }
 
     pub fn erase(mut root: Link, key: i32, data: String) -> Link {
+        let mut assign_root = true;
+
         match root.take() {
             None => return None,
             Some(mut node) => {
@@ -92,20 +94,23 @@ impl Node {
                     node.right = Node::erase(node.right, key, data);
                 } else if key == node.key && data == node.data {
                     if node.left.is_none() || node.right.is_none() {
-                        let mut tmp: Link;
+                        let tmp: Link;
 
-                        if node.left.is_none() {
+                        if node.left.is_some() {
+                            println!("Left is Some for {}", key);
                             tmp = node.left.take();
                         } else {
+                            println!("Right is Some for {}", key);
                             tmp = node.right.take();
                         }
 
-                        match tmp.take() {
-                            None => unreachable!(),
-                            Some(n) => {
+                        if tmp.is_some() {
+                            tmp.map(|n| {
                                 node.data = n.data;
                                 node.key = n.key;
-                            }
+                            });
+                        } else {
+                            assign_root = false;
                         }
                     } else {
                         let mut tmp = Node::find_min_sub_node(&node.right);
@@ -121,18 +126,23 @@ impl Node {
                         node.right = Node::erase(node.right, node.key, node.data.clone());
                     }
                 } else {
+                    println!("Returning for else()");
                     return root;
                 }
 
-                root = Some(node);
+                if assign_root {
+                    root = Some(node);
+                }
             }
         }
 
         if root.is_none() {
+            println!("Returning for is_none()");
             return None;
         }
 
         root.map(|mut n| {
+            println!("Returning for key {}", n.key);
             Node::update_height(&mut n);
             Node::reconstruct(n)
         })

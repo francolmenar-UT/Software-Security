@@ -22,17 +22,17 @@ impl BST {
         };
     }
 
-    // pub fn erase(&mut self, key: i32, data: String) {
-    //     if !self.contains(key, &data) {
-    //         return;
-    //     }
+    pub fn erase(&mut self, key: i32, data: String) {
+        if !self.contains(key, &data) {
+            return;
+        }
 
-    //     match self.root.take() {
-    //         Some(node) => self.root = Some(Node::erase(node, key, data)),
-    //         // Should be caught by the contains
-    //         None => unreachable!(),
-    //     }
-    // }
+        match self.root.take() {
+            Some(node) => self.root = Node::erase(Some(node), key, data),
+            // Should be caught by the contains
+            None => unreachable!(),
+        }
+    }
 
     pub fn height(&self) -> i32 {
         Node::height(&self.root)

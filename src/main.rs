@@ -75,7 +75,7 @@ fn main() {
                     bst.insert(age, name);
                 }
                 Command::Erase { age, name } => {
-                    unimplemented!();
+                    bst.erase(age, name);
                 }
                 Command::Contains { age, name } => {
                     bst.contains(age, &name);
