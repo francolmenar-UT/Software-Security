@@ -10,7 +10,7 @@ rust-latest:
     - cargo test --verbose
   artifacts:
     paths:
-    - target
+      - target
 
 rust-nightly:
   stage: build
@@ -26,3 +26,4 @@ test:
   script:
     - ./test_main.sh
     - ./test_sorted.sh
+    - ./test_json.sh
