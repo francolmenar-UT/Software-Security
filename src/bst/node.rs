@@ -143,14 +143,7 @@ impl Node {
         })
     }
 
-    fn key(node: &Link) -> i32 {
-        match node {
-            Some(node) => node.key,
-            None => unreachable!(),
-        }
-    }
-
-    fn rotate_left_successor(mut root: NodePtr) -> NodePtr {
+    fn rotate_left_child(mut root: NodePtr) -> NodePtr {
         let target = root.left.unwrap();
         if Node::height(&target.left) < Node::height(&target.right) {
             root.left = Some(rotate_left(target));
@@ -161,14 +154,14 @@ impl Node {
         rotate_right(root)
     }
 
-    fn rotate_right_successor(mut root: NodePtr) -> NodePtr {
+    fn rotate_right_child(mut root: NodePtr) -> NodePtr {
         let target = root.right.unwrap();
 
         if Node::height(&target.left) > Node::height(&target.right) {
             root.right = Some(rotate_right(target));
             Node::update_height(&mut root);
         } else {
-            root.right = Some(target)
+            root.right = Some(target);
         }
         rotate_left(root)
     }
@@ -176,11 +169,11 @@ impl Node {
     fn reconstruct(mut root: NodePtr) -> NodePtr {
         let height_diff = Node::balance(&root);
         if height_diff > 1 {
-            return Node::rotate_left_successor(root);
+            return Node::rotate_left_child(root);
         }
 
         if height_diff < -1 {
-            return Node::rotate_right_successor(root);
+            return Node::rotate_right_child(root);
         }
 
         Node::update_height(&mut *root);

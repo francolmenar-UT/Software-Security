@@ -34,10 +34,6 @@ impl BST {
         }
     }
 
-    pub fn height(&self) -> i32 {
-        Node::height(&self.root)
-    }
-
     pub fn contains(&self, key: i32, data: &String) -> bool {
         match self.root {
             Some(ref node) => node.contains(key, data),
