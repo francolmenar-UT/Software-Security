@@ -10,3 +10,10 @@ for i in io-tests/*.json; do
     cat $i | python3 io-tests/tool.py -s
     cat $i | python3 io-tests/tool.py -b
 done
+
+
+for i in {1..10}
+do
+   cargo run 1 | io-tests/tool.py -s
+   cargo run 1 | io-tests/tool.py -b
+done

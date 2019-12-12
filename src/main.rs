@@ -3,6 +3,8 @@ use std::io;
 mod bst;
 use bst::BST;
 
+use std::env;
+
 #[derive(Debug)]
 enum Command {
     Insert { age: i32, name: String },
@@ -59,7 +61,46 @@ fn parse_command(input: String) -> Command {
     }
 }
 
+fn print_fuzz_insert_erase() {
+    use rand::Rng;
+
+    let nr_iters = 100000;
+    let mut bst = BST::new();
+
+    for _ in 0..nr_iters {
+        let mut rng = rand::thread_rng();
+
+        bst.insert(rng.gen_range(0, 100000), String::from("abc"));
+    }
+
+    for _ in 0..(nr_iters / 2) {
+        let mut rng = rand::thread_rng();
+        bst.erase(rng.gen_range(0, 100000), String::from("abc"));
+    }
+
+    for _ in 0..nr_iters {
+        let mut rng = rand::thread_rng();
+
+        bst.insert(rng.gen_range(0, 100000), String::from("abc"));
+    }
+
+    for _ in 0..(nr_iters / 2) {
+        let mut rng = rand::thread_rng();
+        bst.erase(rng.gen_range(0, 100000), String::from("abc"));
+    }
+
+    bst.print_json();
+}
+
 fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    // Run JSON test
+    if args.len() == 2 {
+        print_fuzz_insert_erase();
+        return;
+    }
+
     let mut bst = BST::new();
 
     loop {
