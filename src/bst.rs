@@ -2,20 +2,16 @@ mod node;
 use node::Link;
 use node::Node;
 
-pub struct BST {
+pub struct SortedContainer {
     root: Link,
 }
 
-impl BST {
+impl SortedContainer {
     pub fn new() -> Self {
-        return BST { root: None };
+        return SortedContainer { root: None };
     }
 
     pub fn insert(&mut self, key: i32, data: String) {
-        if self.contains(key, &data) {
-            return;
-        }
-
         match self.root.take() {
             Some(node) => self.root = Some(Node::insert(node, key, data)),
             None => self.root = Some(Box::new(Node::new_leaf(key, data))),
@@ -41,6 +37,8 @@ impl BST {
         }
     }
 
+    // Used for debugging
+    #[allow(dead_code)]
     pub fn inorder_print(&self) {
         match self.root {
             Some(ref node) => {
@@ -51,16 +49,17 @@ impl BST {
         };
     }
 
-    pub fn print_json(&self) {
+    pub fn print(&self) {
         match self.root {
             Some(ref node) => {
-                node.print_json();
+                node.print();
                 println!("");
             }
             None => println!("null"),
         };
     }
 
+    #[allow(dead_code)]
     pub fn debug_print(&self) {
         match self.root {
             Some(ref node) => {
@@ -76,10 +75,10 @@ extern crate rand;
 
 #[cfg(test)]
 mod test {
-    use super::BST;
+    use super::SortedContainer;
     #[test]
     fn basics() {
-        let mut bst = BST::new();
+        let mut bst = SortedContainer::new();
 
         let s = String::from("Alex");
 
@@ -105,13 +104,13 @@ mod test {
         use rand::Rng;
 
         let nr_iters = 100;
-        let mut bst = BST::new();
+        let mut bst = SortedContainer::new();
 
         for _ in 0..nr_iters {
             let mut rng = rand::thread_rng();
 
             bst.insert(rng.gen_range(0, 1000), String::from("abc"));
-            bst.print_json();
+            bst.print();
         }
     }
 
@@ -120,7 +119,7 @@ mod test {
         use rand::Rng;
 
         let nr_iters = 10000;
-        let mut bst = BST::new();
+        let mut bst = SortedContainer::new();
 
         for _ in 0..nr_iters {
             let mut rng = rand::thread_rng();
@@ -132,6 +131,6 @@ mod test {
             bst.erase(rng.gen_range(0, 10000), String::from("abc"));
         }
 
-        bst.print_json();
+        bst.print();
     }
 }

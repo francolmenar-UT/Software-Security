@@ -1,7 +1,7 @@
 use std::io;
 
 mod bst;
-use bst::BST;
+use bst::SortedContainer;
 
 use std::env;
 
@@ -61,11 +61,15 @@ fn parse_command(input: String) -> Command {
     }
 }
 
+// This is the only test that is outside of cargo test, since we have not yet
+// figured out how to just get the printed output from the test without
+// "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out".
+// This is used by the test_json.sh to pass the output to tool.py
 fn print_fuzz_insert_erase() {
     use rand::Rng;
 
     let nr_iters = 100000;
-    let mut bst = BST::new();
+    let mut bst = SortedContainer::new();
 
     for _ in 0..nr_iters {
         let mut rng = rand::thread_rng();
@@ -81,15 +85,15 @@ fn print_fuzz_insert_erase() {
     for _ in 0..nr_iters {
         let mut rng = rand::thread_rng();
 
-        bst.insert(rng.gen_range(0, 100000), String::from("abc"));
+        bst.insert(rng.gen_range(0, 100000), String::from("hejsan"));
     }
 
     for _ in 0..(nr_iters / 2) {
         let mut rng = rand::thread_rng();
-        bst.erase(rng.gen_range(0, 100000), String::from("abc"));
+        bst.erase(rng.gen_range(0, 100000), String::from("hejsan"));
     }
 
-    bst.print_json();
+    bst.print();
 }
 
 fn main() {
@@ -101,7 +105,7 @@ fn main() {
         return;
     }
 
-    let mut bst = BST::new();
+    let mut bst = SortedContainer::new();
 
     loop {
         let mut input = String::new();
@@ -119,13 +123,17 @@ fn main() {
                     bst.erase(age, name);
                 }
                 Command::Contains { age, name } => {
-                    bst.contains(age, &name);
+                    if bst.contains(age, &name) {
+                        println!("y");
+                    } else {
+                        println!("n");
+                    }
                 }
                 Command::Print => {
-                    bst.print_json();
+                    bst.print();
                 }
                 Command::Reset => {
-                    bst = BST::new();
+                    bst = SortedContainer::new();
                 }
                 Command::Exit => {
                     break;

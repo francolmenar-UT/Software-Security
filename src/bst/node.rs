@@ -59,6 +59,9 @@ impl Node {
             root.right = Node::insert_helper(root.right.take(), key, data);
         } else if key < root.key {
             root.left = Node::insert_helper(root.left.take(), key, data);
+        } else {
+            // TODO: This means matching keys, do we need to consider the name?
+            return root;
         }
 
         Node::update_height(&mut *root);
@@ -225,12 +228,12 @@ impl Node {
         }
     }
 
-    pub fn print_json(&self) {
+    pub fn print(&self) {
         print!("[");
         print!("{{\"{}\":\"{}\"}},", self.key, self.data);
         match self.left {
             Some(ref node) => {
-                node.print_json();
+                node.print();
             }
             None => {
                 print!("null");
@@ -240,7 +243,7 @@ impl Node {
 
         match self.right {
             Some(ref node) => {
-                node.print_json();
+                node.print();
             }
             None => {
                 print!("null");
